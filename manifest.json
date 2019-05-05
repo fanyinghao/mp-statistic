@@ -1,0 +1,36 @@
+{
+	"manifest_version": 2,
+	"name": "dayi",
+	"version": "0.0.1",
+	"description": "dayi mp statistic",
+	"icons":
+	{
+		"16": "img/icon.jpg",
+		"48": "img/icon.jpg",
+		"128": "img/icon.jpg"
+	},
+	"background":
+	{
+	},
+	"page_action":
+	{
+		"default_icon": "img/icon.jpg",
+		"default_title": "dayi",
+		"default_popup": "popup.html"
+	},
+	"content_scripts": 
+	[
+		{
+			"matches": ["http://mp.weixin.qq.com/*", "https://mp.weixin.qq.com/*"],
+			"js": ["js/content-script.js"],
+			"run_at": "document_end"
+		}
+	],
+	"web_accessible_resources": ["js/av-min.js", "js/inject.js"],
+	"permissions":
+	[
+		"webRequest"
+	],
+	"homepage_url": "https://wecode.tech",
+	"omnibox": { "keyword" : "dayi" }
+}
