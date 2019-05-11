@@ -83,16 +83,16 @@
         var view1 = chart.view();
         view1.area().position('createdAt*read_num').color('#2fc25b').tooltip(false).shape('smooth');
         view1.point().position('createdAt*read_num').size(4).shape('smooth').style({
-            stroke: '#fff',
-            lineWidth: 0.1,
-            fillOpacity: 0.2
+            stroke: '#2fc25b',
+            lineWidth: 0.05,
+            fillOpacity: 0.08
         });
         var view2 = chart.view();
         view2.axis(true);
-        view2.line().position('createdAt*diff').size(2).shape('smooth');
-        view2.point().position('createdAt*diff').size(4).shape('smooth').style({
-            stroke: '#fff',
-            lineWidth: 1,
+        view2.line().position('createdAt*diff').color('#2fc25b').size(2).shape('smooth');
+        view2.point().position('createdAt*diff').size(0).shape('smooth').style({
+            stroke: '#2fc25b',
+            lineWidth: 2,
             fillOpacity: 1
         });
         chart.render();
