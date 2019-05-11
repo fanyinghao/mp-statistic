@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,height=device-height">
+    <title>公众号文章阅读趋势分析</title>
+    <style>
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        html,
+        body {
+            overflow: hidden;
+            height: 100%;
+            margin: 0;
+        }
+
+        #title {
+            text-align: center;
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="title">title</div>
+    <div id="mountNode"></div>
+    <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@3.13.0/dist/av-min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js"></script>
+    <script>/*Fixing iframe window.innerHeight 0 issue in Safari*/document.body.clientHeight;</script>
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g2-3.5.1/dist/g2.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.data-set-0.10.1/dist/data-set.min.js"></script>
+    <script src="https://gw.alipayobjects.com/os/antv/assets/lib/jquery-3.2.1.min.js"></script>
+    <script>
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        var secret = getParameterByName('secret');
+        var appid = getParameterByName('appid');
+        var appmsgid = parseFloat(getParameterByName('appmsgid'));
+
+        if (!secret || !appid || !appmsgid)
+            document.getElementById('title').innerText = 'error';
+
+        AV.init(appid, secret);
+
+        var cql = 'select appmsgid, title, read_num, comment_num, createdAt, objectId from MpMsgLog where createdAt > ? and appmsgid = ? order by createdAt desc';
+        var pvalues = [{ "__type": "Date", "iso": moment({ day: 1, hour: 0 }).format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z" }, appmsgid];
+
+        var chart = new G2.Chart({
+            container: 'mountNode',
+            forceFit: true,
+            height: window.innerHeight
+        });
+        chart.scale('diff', {
+            alias: '增量',
+            min: 0
+        });
+        chart.scale('read_num', {
+            alias: '阅读数',
+            min: 0
+        });
+        chart.scale('createdAt', {
+            alias: '时间',
+            type: 'timeCat',
+            mask: "HH:mm",
+        });
+        chart.tooltip({
+            crosshairs: {
+                type: 'line'
+            }
+        });
+        // chart.line().position('createdAt*read_num').size(2);
+        // chart.point().position('createdAt*read_num').size(4).shape('circle').style({
+        //     stroke: '#fff',
+        //     lineWidth: 1,
+        //     fillOpacity: 1
+        // });
+        var view1 = chart.view();
+        view1.area().position('createdAt*read_num').tooltip(false).shape('smooth');
+        view1.point().position('createdAt*read_num').size(4).shape('smooth').style({
+            stroke: '#fff',
+            lineWidth: 1,
+            fillOpacity: 1
+        });
+        var view2 = chart.view();
+        view2.axis(true);
+        view2.line().position('createdAt*diff').size(2).shape('smooth');
+        view2.point().position('createdAt*diff').size(4).shape('smooth').style({
+            stroke: '#fff',
+            lineWidth: 1,
+            fillOpacity: 1
+        });
+        chart.render();
+        load();
+
+        setInterval(load, 60000);
+
+        function load() {
+            AV.Query.doCloudQuery(cql, pvalues).then(function (data) {
+                var results = data.results;
+                var data = {}
+                document.getElementById('title').innerText = results[0]._serverData.title;
+
+                Array.prototype.forEach.call(results, function (item) {
+                    if (!data[item._serverData.appmsgid])
+                        data[item._serverData.appmsgid] = [];
+                    data[item._serverData.appmsgid].unshift(Object.assign({ createdAt: item.createdAt }, item._serverData));
+                    const next = data[item._serverData.appmsgid][1];
+                    if (next) {
+                        next.diff = next.read_num - item._serverData.read_num;
+                        data[item._serverData.appmsgid][1] = next;
+                    }
+                })
+
+                Array.prototype.forEach.call(Object.keys(data), function (key) {
+                    const item = data[key];
+                    view1.changeData(item);
+                    view2.changeData(item);
+                }, function (error) {
+                    console.error(error)
+                });
+            })
+        }
+
+    </script>
+</body>
+
+</html>
