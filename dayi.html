@@ -80,18 +80,12 @@
                 type: 'line'
             }
         });
-        // chart.line().position('createdAt*read_num').size(2);
-        // chart.point().position('createdAt*read_num').size(4).shape('circle').style({
-        //     stroke: '#fff',
-        //     lineWidth: 1,
-        //     fillOpacity: 1
-        // });
         var view1 = chart.view();
-        view1.area().position('createdAt*read_num').tooltip(false).shape('smooth');
+        view1.area().position('createdAt*read_num').color('#2fc25b').tooltip(false).shape('smooth');
         view1.point().position('createdAt*read_num').size(4).shape('smooth').style({
             stroke: '#fff',
-            lineWidth: 1,
-            fillOpacity: 1
+            lineWidth: 0.1,
+            fillOpacity: 0.2
         });
         var view2 = chart.view();
         view2.axis(true);
