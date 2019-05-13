@@ -7,6 +7,10 @@ const interval = setInterval(() => {
   doAction();
 }, 60000);
 
+setInterval(() => {
+  document.location.reload();
+}, 1000 * 60 * 5);
+
 function doAction() {
   const items = wx.cgiData.mass_data;
   if (items.length === 0) return;
