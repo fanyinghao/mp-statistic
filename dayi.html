@@ -54,8 +54,8 @@
 
         AV.init(appid, secret);
 
-        var cql = 'select appmsgid, title, read_num, comment_num, createdAt, objectId from MpMsgLog where createdAt > ? and appmsgid = ? order by createdAt desc';
-        var pvalues = [{ "__type": "Date", "iso": moment({ day: 1, hour: 0 }).format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z" }, appmsgid];
+        var cql = 'select appmsgid, title, read_num, comment_num, createdAt, objectId from MpMsgLog where createdAt > ? and appmsgid = ? order by createdAt desc limit ?';
+        var pvalues = [{ "__type": "Date", "iso": moment({ day: 1, hour: 0 }).format("YYYY-MM-DDTHH:mm:ss.SSS") + "Z" }, appmsgid, 1000];
 
         var chart = new G2.Chart({
             container: 'mountNode',
